@@ -21,4 +21,7 @@ bash ./CRISPRia.sh myfile.config
 
 https://github.com/Carlospq/CRISPETa
 
+# To test output:
+
+Output file containing top 10 CRISPRi designs for test.bed in has been provided in test_files. A fantom range of 10 was used with hg19_masked.fa
     
