@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 import re, sys, os
 from Bio.Seq import Seq
 import subprocess
