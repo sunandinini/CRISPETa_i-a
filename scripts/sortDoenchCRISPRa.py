@@ -3,6 +3,8 @@ import subprocess
 from operator import itemgetter
 import operator
 
+from plots import *
+
 # read input and output files from command line
 input_file = open(sys.argv[1], 'r')
 strand_file = open(sys.argv[2], 'r')
@@ -14,6 +16,9 @@ submode = sys.argv[5]
 
 #number of top sgRNAs returned
 n_gRNA = int(sys.argv[6])
+regions_0 = 0
+complete_regions = 0
+incomplete_regions = 0
 
 
 ## CRISPRa ##
@@ -135,8 +140,9 @@ def sgRNAs_single(dic, output_file=output_file, n_gRNA=n_gRNA):
 		 	output_file.write("\t".join(sgRNA+[str(n)]+["\n"]))
 		 	n += 1
 
-def sgRNAs_paired(dic, output_file=output_file, n_gRNA=n_gRNA, mode=mode):
-
+def sgRNAs_paired(dic, output_file=output_file, n_gRNA=n_gRNA, mode=mode, regions_0 = regions_0, incomplete_regions = incomplete_regions, complete_regions = complete_regions):
+	global no_sgRNA
+	no_sgRNA = []
 	if mode == "CRISPRa":
 		limit = 150
 	elif mode == "CRISPRi":
@@ -177,12 +183,40 @@ def sgRNAs_paired(dic, output_file=output_file, n_gRNA=n_gRNA, mode=mode):
 				continue
 			counter[pair[4]] += 1
 			counter[pair[18]] += 1
+			
+			if (pair[5] == '+'):
+					pair[4] = pair[4][4:24]
+					pair[3] = int(pair[3]) - 3 #to modify the final sgRNA, if + strand then cut off NGG
+			else:
+					pair[4] = pair[4][6:26]
+					pair[2] = int(pair[2]) + 3 #to modify the final sgRNA, if - strand then cut off CCN
+			if (pair[19] == '+'):
+					pair[18] = pair[18][4:24]
+					pair[17] = int(pair[17]) - 3
+			else:
+					pair[18] = pair[18][6:26]
+					pair[16] = int(pair[16]) + 3
 		
 			for i in range(0,len(pair)):
+					
 			 	pair[i] = str(pair[i])
+			 	
 			output_file.write("\t".join(pair+[str(n)]+["\n"]))
 			
 			n += 1
+		if n == 0:
+			regions_0 += 1
+			no_sgRNA.append(target)
+			
+		elif n < n_gRNA:
+			incomplete_regions += 1
+		else: 
+			complete_regions += 1
+	global results_regions
+	results_regions = [regions_0, incomplete_regions, complete_regions]	
+	return results_regions, no_sgRNA
+
+
 			
 # Print header in output
 output_file.write("\t".join(["target_id", "chr", "sgRNA_start", "sgRNA_end", "sgRNA_context", "sgRNA_strand", "off0", "off1", "off2", "off3", "off4", "score_rule_set2", "dist_to_TSS", "Picking_Round", "\n"]))
@@ -215,7 +249,7 @@ for target in dic:
 
 	targetID = target.split(":")[0].replace(">","")
 	targetStrand = GeneStrands[targetID]
-
+	pos = 0
 	for sgRNA in dic[target]:
 	 	for i in x:
 	 		if i == 11:
@@ -226,7 +260,12 @@ for target in dic:
 		dist = dist_to_TSS(sgRNA, targetStrand)
 		offTargets = int(sgRNA[6])
 		score = float(sgRNA[-1])
-
+		if dist > 320:       #### modified to take care of distances > 320 -- inefficient for crispr inhibition
+			dic[target].pop(pos)
+			pos = pos + 1
+			continue
+		else:
+			pos = pos + 1
 		ranking = Picking_Round(mode, dist, offTargets, score)
 		
 		sgRNA.append(dist)
@@ -235,11 +274,24 @@ for target in dic:
 	dic[target] = [item for item in dic[target] if item[-1] < 12]
 	dic[target].sort(key=lambda x: x[13])
 
+
 if submode == "single":
 	sgRNAs_single(dic)
 
 if submode == "paired":
 	sgRNAs_paired(dic)
-
-
+	
 output_file.close()
+file_name = sys.argv[3]
+plots(file_name, results_regions)
+
+fo = open('./results/no_sgRNA.txt', 'w+')
+for i in no_sgRNA:
+	a = i.split('>')
+	b = a[1].split(':')
+	fo.write(b[0]+'\n')
+fo.close()
+	
+
+
+
