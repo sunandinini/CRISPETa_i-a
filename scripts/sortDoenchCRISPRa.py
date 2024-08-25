@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.7
 import re, sys
 import subprocess
 from operator import itemgetter
@@ -183,18 +184,17 @@ def sgRNAs_paired(dic, output_file=output_file, n_gRNA=n_gRNA, mode=mode, region
 				continue
 			counter[pair[4]] += 1
 			counter[pair[18]] += 1
-			
 			if (pair[5] == '+'):
 					pair[4] = pair[4][4:24]
 					pair[3] = int(pair[3]) - 3 #to modify the final sgRNA, if + strand then cut off NGG
 			else:
-					pair[4] = pair[4][6:26]
+					pair[4] = str(Seq(pair[4][6:26]).reverse_complement())
 					pair[2] = int(pair[2]) + 3 #to modify the final sgRNA, if - strand then cut off CCN
 			if (pair[19] == '+'):
 					pair[18] = pair[18][4:24]
 					pair[17] = int(pair[17]) - 3
 			else:
-					pair[18] = pair[18][6:26]
+					pair[18] = str(Seq(pair[18][6:26]).reverse_complement())
 					pair[16] = int(pair[16]) + 3
 		
 			for i in range(0,len(pair)):
@@ -251,15 +251,15 @@ for target in dic:
 	targetStrand = GeneStrands[targetID]
 	pos = 0
 	for sgRNA in dic[target]:
-	 	for i in x:
-	 		if i == 11:
-	 			sgRNA[i] = float(sgRNA[i])
-	 		else:
-	 			sgRNA[i] = int(sgRNA[i])
-	
+		for i in x:
+			if i == 11:
+				sgRNA[i] = float(sgRNA[i])
+			else:
+				sgRNA[i] = int(sgRNA[i])
 		dist = dist_to_TSS(sgRNA, targetStrand)
 		offTargets = int(sgRNA[6])
 		score = float(sgRNA[-1])
+			
 		if dist > 320:       #### modified to take care of distances > 320 -- inefficient for crispr inhibition
 			dic[target].pop(pos)
 			pos = pos + 1
