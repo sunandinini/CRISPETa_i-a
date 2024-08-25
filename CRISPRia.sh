@@ -26,8 +26,10 @@
 . $1
 
 # Create tmp folder
+cd "${0%/*}"
 mkdir -p tmp
 mkdir -p results
+mkdir -p plots
 
 # Gather scripts dir
 scripts_dir=$( echo $0 | sed 's/CRISPRia\.sh/scripts/' )
@@ -74,7 +76,7 @@ python $scripts_dir/sortDoenchCRISPRa.py results/sgRNAs_avaluated.txt tmp/FANTOM
 # Result to BED format
 # For $SUBMODE == paired
 if [ $SUBMODE == "paired" ]; then
-	echo "track name='paired_CRISPR_designs' description=' ' visibility=3 itemRgb='On'" > results/$MODE"_"$SUBMODE"_designs.bed";
+	echo "track name='paired_CRISPRi_designs' description=' ' visibility=3 itemRgb='On'" > results/$MODE"_"$SUBMODE"_designs.bed";
 	awk 'NR>1 {{
 			if ( $3 > $17 ){
 				MIN=$17
@@ -90,8 +92,8 @@ if [ $SUBMODE == "paired" ]; then
 				MAX=$18
 			}
 		  }
-		  {OFS="\t"; print $2, MIN, MAX, $1, $NF, ".", MIN, MAX, "150.0,0,0", 2, "23,23", "0,"MAX-MIN-23}}' results/$MODE"_"$SUBMODE"_top_"$n_gRNAs"_selected.txt" >> results/$MODE"_"$SUBMODE"_designs.bed";
-fi
+		  {OFS="\t"; print $2, MIN, MAX, $1, $NF, ".", MIN, MAX, "150.0,0,0", 2, "20,20", "0,"MAX-MIN-20}}' results/$MODE"_"$SUBMODE"_top_"$n_gRNAs"_selected.txt" >> results/$MODE"_"$SUBMODE"_designs.bed";
+fi  ##Changed "23,23" to "20,20" and "MAX-MIN-23 to MAX-MIN-20"
 
 # For $SUBMODE == single
 if [ $SUBMODE == "single" ]; then
