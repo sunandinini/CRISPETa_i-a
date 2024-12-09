@@ -32,5 +32,5 @@ https://github.com/Carlospq/CRISPETa
 
 Output file containing top 10 CRISPRi designs along with the input "test.bed" has been provided in test_files. 
 
-A fantom range of 10 was used with masked version of human genome fasta (reference genome: hg19) and the fantom TSS file linked above. 
+A fantom range of 10 was used with masked fasta and the fantom TSS file for the hg19 human genome (see link above). 
     
