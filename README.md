@@ -24,12 +24,11 @@ bash ./CRISPRia.sh myfile.config
 1. Fasta file for the genome of interest. 
 2. Fantom TSS CAGE peaks (https://fantom.gsc.riken.jp/5/datafiles/latest/extra/CAGE_peaks/)
    
-# IMPORTANT: CRISPETa needs off-target scores to run! 
-# Find instructions here for how to set up the MySQL database for off-targets:
+# IMPORTANT: CRISPETa needs off-target scores to run! Find instructions here for how to set up the MySQL database for off-targets:
 
 https://github.com/Carlospq/CRISPETa
 
-# To test output:
+# To test CRISPETa-i_a:
 
 Output file containing top 10 CRISPRi designs along with the input "test.bed" has been provided in test_files. 
 
