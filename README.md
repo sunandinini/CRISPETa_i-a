@@ -1,3 +1,6 @@
+# Original code written by carlospq. Slight modifications have been made to it to ensure correct output sequences for guide RNAs on the negative / anti-sense strand. 
+
+
 # How to run CRISPETa-i/a
 
 Update the file paths in "myfile.config"
